@@ -1,0 +1,672 @@
+<title>Rhema Gym ERP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-width loaded barbell hero, then a plate rack of modules, a machine status playground, an owner's dashboard, a member lifecycle line and a plain list of safeguards. Left aligned throughout. */
+:root {
+  /* dark-first: iron floor, steel, and Olympic plate colours */
+  --bg: #0e1424;
+  --surface: #151c31;
+  --line: #2a3452;
+  --fg: #eaeef7;
+  --muted: #9aa5bf;
+  --steel: #aab4c8;
+  --steel-dark: #6d7894;
+  --red: #d8392b;
+  --blue: #3a74ff;
+  --yellow: #f4c20d;
+  --green: #25a85c;
+  --white-plate: #eef1f7;
+  --on-accent: #ffffff;
+  --ok-bg: rgba(37,168,92,.18); --ok-fg: #5fd48f;
+  --warn-bg: rgba(244,194,13,.16); --warn-fg: #f4c20d;
+  --bad-bg: rgba(216,57,43,.2); --bad-fg: #ff8a7e;
+  --info-bg: rgba(58,116,255,.2); --info-fg: #8db1ff;
+  --off-bg: rgba(154,165,191,.15); --off-fg: #9aa5bf;
+  --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #eef1f7; --surface: #ffffff; --line: #cfd6e6; --fg: #0f172a; --muted: #536079;
+    --steel: #8791a8; --steel-dark: #5b6580;
+    --red: #c9301f; --blue: #2c62e6; --yellow: #e0ad00; --green: #1d9150; --white-plate: #ffffff;
+    --ok-bg: #d9f2e4; --ok-fg: #12683a; --warn-bg: #fbefc2; --warn-fg: #7a5a00;
+    --bad-bg: #fbdad5; --bad-fg: #9b2216; --info-bg: #dbe6ff; --info-fg: #1c47b0;
+    --off-bg: #e2e6f0; --off-fg: #4b5670;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #eef1f7; --surface: #ffffff; --line: #cfd6e6; --fg: #0f172a; --muted: #536079;
+  --steel: #8791a8; --steel-dark: #5b6580;
+  --red: #c9301f; --blue: #2c62e6; --yellow: #e0ad00; --green: #1d9150; --white-plate: #ffffff;
+  --ok-bg: #d9f2e4; --ok-fg: #12683a; --warn-bg: #fbefc2; --warn-fg: #7a5a00;
+  --bad-bg: #fbdad5; --bad-fg: #9b2216; --info-bg: #dbe6ff; --info-fg: #1c47b0;
+  --off-bg: #e2e6f0; --off-fg: #4b5670;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+  padding-block: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: clip;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  background: var(--bg); z-index: 30;
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; line-height: .95; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+.sec { padding-block: clamp(56px, 9vw, 112px); }
+.sec-head { display: grid; gap: 14px; max-width: 720px; margin-bottom: clamp(28px, 5vw, 48px); }
+.sec-head h2 { font-size: clamp(40px, 6.2vw, 72px); }
+.sec-head p { color: var(--muted); max-width: 60ch; font-size: 18px; }
+
+/* header */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding-inline: max(16px, env(safe-area-inset-left, 0px));
+}
+.top-in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 20px; min-height: 62px; }
+.brand { font-family: var(--display); font-weight: 700; font-size: 26px; text-decoration: none; display: flex; align-items: center; gap: 10px; letter-spacing: .01em; }
+.brand-mark { width: 22px; height: 22px; border-radius: 50%; border: 5px solid var(--red); position: relative; }
+.brand-mark::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--bg); border: 2px solid var(--steel); }
+.nav { margin-left: auto; display: flex; gap: 22px; align-items: center; }
+.nav a { text-decoration: none; color: var(--muted); font-weight: 500; font-size: 15px; }
+.nav a:hover { color: var(--fg); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--red); color: var(--on-accent); font-weight: 600; font-size: 16px;
+  padding: 13px 22px; border-radius: 6px; text-decoration: none; border: 0; cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+}
+.btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-quiet { background: transparent; color: var(--fg); border: 1.5px solid var(--line); }
+.btn-quiet:hover { border-color: var(--steel); filter: none; }
+.nav .btn { padding: 9px 16px; font-size: 15px; color: var(--on-accent); }
+@media (max-width: 760px) { .nav a.nl { display: none; } }
+
+/* hero */
+.hero { padding-top: clamp(36px, 6vw, 72px); overflow: hidden; }
+.hero h1 { font-size: clamp(56px, 11.5vw, 156px); max-width: 11ch; }
+.hero-sub { display: flex; flex-wrap: wrap; gap: 28px 48px; align-items: flex-end; margin-top: 26px; }
+.hero-sub p { max-width: 52ch; font-size: 19px; color: var(--muted); }
+.hero-sub p b { color: var(--fg); font-weight: 600; }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.rig { margin-top: clamp(36px, 6vw, 64px); }
+.barbell {
+  font-size: clamp(5.4px, 1.22vw, 13px);
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  animation: flex-bar 1.4s ease-out 2.6s backwards;
+}
+.side { position: relative; min-width: 17em; height: 20em; display: flex; align-items: center; z-index: 1; }
+.side::before { content: ""; position: absolute; left: 0; right: 0; height: 2em; top: 50%; margin-top: -1em; z-index: 0;
+  background: linear-gradient(180deg, #e8edf6 0%, var(--steel) 45%, var(--steel-dark) 100%); }
+.side.l { justify-content: flex-end; border-radius: 0; }
+.side.l::after, .side.r::after { content: ""; position: absolute; width: 1.1em; height: 3.2em; top: 50%; margin-top: -1.6em; background: #2b3350; border: .15em solid var(--steel-dark); border-radius: .3em; z-index: 3; }
+.side.l::after { left: 1em; }
+.side.r::after { right: 1em; }
+.side.r { justify-content: flex-start; }
+.shoulder { width: .9em; height: 3.4em; background: linear-gradient(90deg, var(--steel-dark), #e8edf6, var(--steel-dark)); border-radius: .2em; z-index: 2; }
+.shaft {
+  flex: 1; min-width: 6em; height: 1.05em; z-index: 1;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 .12em, transparent .12em .42em),
+    linear-gradient(180deg, #eef2fa 0%, var(--steel) 50%, var(--steel-dark) 100%);
+}
+.plate {
+  position: relative; z-index: 2; border: 0; padding: 0; cursor: pointer;
+  width: 2.3em; margin: 0 .1em; border-radius: .45em; color: #0d1220;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-weight: 700; font-size: 1.9em; line-height: 1;
+  box-shadow: inset .25em 0 .3em rgba(255,255,255,.28), inset -.25em 0 .35em rgba(0,0,0,.28), 0 .1em .4em rgba(0,0,0,.35);
+  transition: width .45s cubic-bezier(.3,.9,.3,1), margin .45s cubic-bezier(.3,.9,.3,1), opacity .3s ease, transform .3s ease;
+  animation: slam .9s cubic-bezier(.2,.75,.25,1) backwards;
+}
+.plate span { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .04em; white-space: nowrap; }
+.plate:hover { transform: translateY(-.5em); }
+.p0 { height: 19em; background: var(--red); color: #fff; }
+.p1 { height: 17.5em; background: var(--blue); color: #fff; }
+.p2 { height: 15.5em; background: var(--yellow); }
+.p3 { height: 12.5em; background: var(--green); color: #fff; }
+.p4 { height: 9.5em; background: var(--white-plate); }
+.plate.off { width: 0; margin: 0; opacity: 0; overflow: hidden; pointer-events: none; }
+.side.l .p0 { animation-delay: .35s; --from: -120vw; } .side.l .p1 { animation-delay: .7s; --from: -120vw; }
+.side.l .p2 { animation-delay: 1.05s; --from: -120vw; } .side.l .p3 { animation-delay: 1.4s; --from: -120vw; }
+.side.l .p4 { animation-delay: 1.75s; --from: -120vw; }
+.side.r .p0 { animation-delay: .35s; --from: 120vw; } .side.r .p1 { animation-delay: .7s; --from: 120vw; }
+.side.r .p2 { animation-delay: 1.05s; --from: 120vw; } .side.r .p3 { animation-delay: 1.4s; --from: 120vw; }
+.side.r .p4 { animation-delay: 1.75s; --from: 120vw; }
+@keyframes slam { from { transform: translateX(var(--from)); } 82% { transform: translateX(0); } 90% { transform: translateX(.35em); } 100% { transform: translateX(0); } }
+.side.r .p0, .side.r .p1, .side.r .p2, .side.r .p3, .side.r .p4 { }
+@keyframes flex-bar { 0% { transform: scaleY(1); } 30% { transform: scaleY(1.0) rotate(.35deg); } 60% { transform: rotate(-.25deg); } 100% { transform: none; } }
+
+.load-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin-top: 22px; }
+.load-row .kg { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: 1; font-variant-numeric: tabular-nums; min-width: 4.2ch; }
+.load-row .kg small { font-size: 22px; color: var(--muted); margin-left: 4px; }
+.load-row .hint { color: var(--muted); font-size: 15px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.chip {
+  font: 600 15px var(--body); border: 1.5px solid var(--line); background: transparent; color: var(--fg);
+  border-radius: 999px; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.chip::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--c, var(--steel)); border: 1px solid rgba(0,0,0,.3); }
+.chip[aria-pressed="false"] { opacity: .55; text-decoration: line-through; }
+.chip:hover { border-color: var(--steel); }
+
+/* modules */
+.rack { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+.disc {
+  --c: var(--red);
+  width: 108px; height: 108px; border-radius: 50%; border: 0; cursor: pointer; padding: 0; position: relative;
+  background: radial-gradient(circle at 50% 50%, var(--bg) 0 13%, transparent 13.5%), conic-gradient(from 20deg, var(--c), color-mix(in srgb, var(--c) 70%, #000), var(--c));
+  color: #fff; font: 700 17px/1.05 var(--display); display: flex; align-items: flex-end; justify-content: center; text-align: center;
+  box-shadow: inset 0 0 0 5px rgba(0,0,0,.18), 0 6px 14px rgba(0,0,0,.28);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.disc::before { content: ""; position: absolute; inset: 11px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); }
+.disc span { position: relative; padding: 0 8px 17px; text-shadow: 0 1px 2px rgba(0,0,0,.45); font-size: 18px; }
+.disc[data-dark="1"] { color: #0d1220; }
+.disc[data-dark="1"] span { text-shadow: none; }
+.disc:hover { transform: translateY(-4px); }
+.disc[aria-selected="true"] { transform: translateY(-6px) scale(1.06); box-shadow: inset 0 0 0 5px rgba(0,0,0,.18), 0 0 0 3px var(--bg), 0 0 0 6px var(--fg), 0 10px 20px rgba(0,0,0,.35); }
+.disc.spin { animation: spin .7s cubic-bezier(.3,.8,.3,1); }
+@keyframes spin { to { transform: rotate(360deg) translateY(-6px) scale(1.06); } }
+.mod-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(24px, 4vw, 56px); align-items: start; border-top: 1px solid var(--line); padding-top: 32px; }
+.mod-panel h3 { font-size: clamp(34px, 4.4vw, 54px); margin-bottom: 14px; }
+.mod-panel .lead { color: var(--muted); font-size: 18px; max-width: 46ch; }
+.mod-panel ul { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 10px; }
+.mod-panel li { padding-left: 22px; position: relative; max-width: 50ch; }
+.mod-panel li::before { content: ""; position: absolute; left: 0; top: .6em; width: 10px; height: 3px; background: var(--c, var(--red)); border-radius: 2px; }
+.mock { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.mock-bar { display: flex; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { text-align: left; font-weight: 500; color: var(--muted); font-size: 13px; padding: 10px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 12px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.pill.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.pill.bad { background: var(--bad-bg); color: var(--bad-fg); }
+.pill.info { background: var(--info-bg); color: var(--info-fg); }
+.pill.off { background: var(--off-bg); color: var(--off-fg); }
+.bubble-wrap { padding: 22px 16px 26px; display: grid; gap: 12px; }
+.bubble { background: var(--ok-bg); border-radius: 12px 12px 12px 2px; padding: 14px 16px; max-width: 40ch; white-space: pre-line; font-size: 15px; line-height: 1.5; }
+.bubble-meta { font-size: 13px; color: var(--muted); }
+
+/* equipment */
+.eq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.machine { border-top: 2px solid var(--line); padding-top: 18px; display: grid; gap: 14px; }
+.machine[data-status="active"] { border-color: var(--green); }
+.machine[data-status="under_maintenance"] { border-color: var(--yellow); }
+.machine[data-status="damaged"] { border-color: var(--red); }
+.machine[data-status="repaired"] { border-color: var(--blue); }
+.machine[data-status="retired"] { border-color: var(--steel-dark); }
+.stage { background: var(--surface); border-radius: 10px; aspect-ratio: 11 / 7; max-width: 100%; display: flex; }
+.stage svg { width: 100%; height: 100%; }
+.machine[data-status="retired"] .stage svg { opacity: .35; filter: grayscale(1); }
+.machine[data-status="damaged"] .stage svg { transform: rotate(-3deg); transform-origin: 50% 80%; }
+.machine h3 { font-size: 30px; }
+.m-meta { color: var(--muted); font-size: 15px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.stat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc { font: 500 13px var(--body); border: 1.5px solid var(--line); background: transparent; color: var(--muted); padding: 5px 11px; border-radius: 999px; cursor: pointer; }
+.sc[aria-checked="true"] { color: var(--fg); border-color: var(--fg); background: var(--surface); }
+.sc:hover { color: var(--fg); }
+.m-note { font-size: 15px; color: var(--muted); min-height: 2.9em; }
+.st-steel { stroke: var(--steel); fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.fl-steel { fill: var(--steel); }
+.fl-dark { fill: var(--steel-dark); }
+.fl-red { fill: var(--red); } .fl-blue { fill: var(--blue); } .fl-yellow { fill: var(--yellow); }
+.belt { stroke: var(--fg); stroke-width: 5; stroke-dasharray: 11 9; stroke-linecap: round; animation: belt .5s linear infinite; opacity: .8; }
+@keyframes belt { to { stroke-dashoffset: -20; } }
+.swing { transform-box: view-box; transform-origin: 110px 8px; animation: swing 1.6s ease-in-out infinite alternate; }
+@keyframes swing { from { transform: rotate(-38deg); } to { transform: rotate(38deg); } }
+.curl { transform-box: view-box; transform-origin: 70px 112px; animation: curl 1.8s ease-in-out infinite alternate; }
+@keyframes curl { from { transform: rotate(0deg); } to { transform: rotate(-105deg); } }
+.roll { transform-box: fill-box; transform-origin: center; animation: roll .5s linear infinite; }
+@keyframes roll { to { transform: rotate(-360deg); } }
+.machine:not([data-status="active"]):not([data-status="repaired"]) .belt,
+.machine:not([data-status="active"]):not([data-status="repaired"]) .swing,
+.machine:not([data-status="active"]):not([data-status="repaired"]) .curl,
+.machine:not([data-status="active"]):not([data-status="repaired"]) .roll { animation-play-state: paused; }
+.machine[data-status="under_maintenance"] .swing { animation-play-state: paused; transform: rotate(0deg); }
+.machine[data-status="under_maintenance"] .curl { transform: rotate(-40deg); }
+
+/* dashboard */
+.dash { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: clamp(18px, 3vw, 32px); display: grid; gap: 28px; }
+.dash-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 8px; }
+.tile { padding: 16px 18px; border-right: 1px solid var(--line); min-width: 0; }
+.tile:last-child { border-right: 0; }
+@media (max-width: 700px) { .tile { border-right: 0; border-bottom: 1px solid var(--line); } .tile:last-child { border-bottom: 0; } }
+.tile .lab { color: var(--muted); font-size: 14px; }
+.tile .val { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile .sub { font-size: 13px; color: var(--muted); }
+.charts { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px; }
+@media (max-width: 860px) { .charts { grid-template-columns: minmax(0, 1fr); } }
+.charts h3 { font-size: 24px; margin-bottom: 12px; letter-spacing: 0; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+.ax { fill: var(--muted); font: 500 12px var(--body); }
+.grid-l { stroke: var(--line); stroke-width: 1; }
+.bar-rev { fill: var(--blue); } .bar-exp { fill: var(--steel-dark); }
+.bar-grow { transform-box: fill-box; transform-origin: bottom; }
+.play .bar-grow { animation: grow .8s cubic-bezier(.2,.8,.2,1) backwards; }
+@keyframes grow { from { transform: scaleY(0); } }
+.legend { display: flex; gap: 18px; font-size: 14px; color: var(--muted); margin-top: 6px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.dist { display: grid; gap: 14px; }
+.dist-row { display: grid; gap: 5px; font-size: 15px; }
+.dist-row div:first-child { display: flex; justify-content: space-between; }
+.track { height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.fill { height: 100%; border-radius: 6px; transform-origin: left; }
+.play .fill { animation: fillx 1s cubic-bezier(.2,.8,.2,1) backwards; }
+@keyframes fillx { from { transform: scaleX(0); } }
+
+/* lifecycle */
+.flow { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px; position: relative; counter-reset: s; }
+.flow::before { content: ""; position: absolute; left: 0; right: 0; top: 22px; height: 6px; background: linear-gradient(90deg, var(--red) 0 20%, var(--blue) 20% 40%, var(--yellow) 40% 60%, var(--green) 60% 80%, var(--white-plate) 80%); border-radius: 3px; transform-origin: left; }
+.play.flow::before { animation: fillx 1.4s cubic-bezier(.2,.8,.2,1) backwards; }
+.flow li { position: relative; padding-top: 58px; }
+.flow .dot { position: absolute; top: 0; left: 0; width: 50px; height: 50px; border-radius: 50%; background: var(--bg); border: 3px solid var(--fg); display: flex; align-items: center; justify-content: center; font: 700 24px var(--display); }
+.flow h3 { font-size: 28px; margin-bottom: 8px; letter-spacing: 0; }
+.flow p { color: var(--muted); font-size: 15.5px; }
+@media (max-width: 900px) {
+  .flow { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  .flow::before { left: 22px; right: auto; width: 6px; top: 0; bottom: 0; height: auto; background: linear-gradient(180deg, var(--red) 0 20%, var(--blue) 20% 40%, var(--yellow) 40% 60%, var(--green) 60% 80%, var(--white-plate) 80%); }
+  .flow li { padding: 0 0 0 72px; min-height: 50px; }
+}
+
+/* safeguards */
+.guard { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(24px, 5vw, 72px); }
+@media (max-width: 800px) { .guard { grid-template-columns: minmax(0, 1fr); } }
+.guard div { border-top: 1px solid var(--line); padding: 18px 0 20px; }
+.guard dt { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1.1; }
+.guard dd { margin: 6px 0 0; color: var(--muted); max-width: 52ch; }
+.stack { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+.stack b { color: var(--fg); font-weight: 600; }
+
+/* cta + footer */
+.cta { background: var(--surface); border-radius: 14px; padding: clamp(28px, 6vw, 72px); display: grid; gap: 22px; position: relative; overflow: hidden; }
+.cta h2 { font-size: clamp(44px, 7.5vw, 96px); max-width: 14ch; }
+.cta p { color: var(--muted); max-width: 52ch; font-size: 18px; }
+.cta-plates { position: absolute; right: -40px; top: 50%; translate: 0 -50%; display: flex; gap: 6px; opacity: .9; pointer-events: none; }
+.cta-plates i { display: block; width: 30px; border-radius: 6px; }
+@media (max-width: 800px) { .cta-plates { display: none; } }
+footer { padding-block: 40px 56px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; color: var(--muted); font-size: 15px; }
+footer a { color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#top" aria-label="Rhema Gym ERP, back to top"><span class="brand-mark" aria-hidden="true"></span>Rhema Gym ERP</a>
+    <nav class="nav" aria-label="Sections">
+      <a class="nl" href="#modules">Modules</a>
+      <a class="nl" href="#equipment">Equipment</a>
+      <a class="nl" href="#dashboard">Dashboard</a>
+      <a class="nl" href="#lifecycle">Member journey</a>
+      <a class="btn" href="https://www.rhema.co.in/" target="_blank" rel="noopener">Book a demo</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero wrap" aria-labelledby="h1">
+    <h1 id="h1">Run the gym. Not the spreadsheet.</h1>
+    <div class="hero-sub">
+      <p><b>Rhema Gym ERP</b> keeps members, plans, payments, equipment and staff in one system, so the front desk and the owner are always looking at the same numbers.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://www.rhema.co.in/" target="_blank" rel="noopener">Book a demo</a>
+        <a class="btn btn-quiet" href="#modules">See what is inside</a>
+      </div>
+    </div>
+
+    <div class="rig">
+      <div class="barbell" id="barbell" role="group" aria-label="Barbell loaded with Olympic plates">
+        <div class="side l" data-side="l"></div>
+        <div class="shoulder"></div>
+        <div class="shaft"></div>
+        <div class="shoulder"></div>
+        <div class="side r" data-side="r"></div>
+      </div>
+      <div class="load-row">
+        <div class="kg" aria-live="polite"><span id="kg">170</span><small>kg on the bar</small></div>
+        <p class="hint">Click a plate, or a weight, to take it off.</p>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="modules" aria-labelledby="mod-h">
+    <div class="sec-head">
+      <h2 id="mod-h">Seven modules, one bar.</h2>
+      <p>Pick a plate. Each module covers one part of running a gym, and they all read from the same member and payment records.</p>
+    </div>
+    <div class="rack" role="tablist" aria-label="Gym ERP modules" id="rack"></div>
+    <div class="mod-panel" id="panel" role="tabpanel" aria-live="polite"></div>
+  </section>
+
+  <section class="sec wrap" id="equipment" aria-labelledby="eq-h">
+    <div class="sec-head">
+      <h2 id="eq-h">Every machine, on the record.</h2>
+      <p>Gym ERP tracks each piece of equipment with its brand, serial number, warranty dates, location and a full maintenance history. Change a status below to see how the floor reflects it.</p>
+    </div>
+    <div class="eq-grid" id="eq"></div>
+  </section>
+
+  <section class="sec wrap" id="dashboard" aria-labelledby="d-h">
+    <div class="sec-head">
+      <h2 id="d-h">The owner's view of the month.</h2>
+      <p>Revenue is shown net of refunds, and profit is revenue minus expenses. Each role sees only the widgets you choose for it.</p>
+    </div>
+    <div class="dash" id="dash">
+      <div class="dash-top"><span>Sample dashboard, November 2026</span><span>Figures are examples, not live data</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="lab">Active members</div><div class="val" data-count="412">412</div><div class="sub">23 memberships expiring this week</div></div>
+        <div class="tile"><div class="lab">Revenue this month</div><div class="val" data-count="384500" data-fmt="inr">₹3,84,500</div><div class="sub">After ₹13,000 refunds</div></div>
+        <div class="tile"><div class="lab">Expenses</div><div class="val" data-count="192000" data-fmt="inr">₹1,92,000</div><div class="sub">Rent, power, salaries, repairs</div></div>
+        <div class="tile"><div class="lab">Net profit</div><div class="val" data-count="192500" data-fmt="inr">₹1,92,500</div><div class="sub">₹46,200 still pending</div></div>
+      </div>
+      <div class="charts">
+        <div>
+          <h3>Revenue and expenses</h3>
+          <div class="chart-box" id="chart"></div>
+          <div class="legend"><span><i style="background:var(--blue)"></i>Revenue</span><span><i style="background:var(--steel-dark)"></i>Expenses</span><span>November is month to date</span></div>
+        </div>
+        <div>
+          <h3>Members by plan</h3>
+          <div class="dist" id="dist"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec wrap" id="lifecycle" aria-labelledby="l-h">
+    <div class="sec-head">
+      <h2 id="l-h">One member, start to renewal.</h2>
+      <p>The same record follows a member through every step, so nobody retypes a phone number or hunts for an old receipt.</p>
+    </div>
+    <ol class="flow" id="flow">
+      <li><span class="dot" aria-hidden="true">1</span><h3>Join</h3><p>Add the member with a photo, contact details, emergency contact and health notes. They get an ID such as GYM0001.</p></li>
+      <li><span class="dot" aria-hidden="true">2</span><h3>Pick a plan</h3><p>Assign a membership plan. Change the plan, freeze it or transfer it later without starting over.</p></li>
+      <li><span class="dot" aria-hidden="true">3</span><h3>Take payment</h3><p>Record the payment and generate a PDF invoice with the amount in words. Refunds are tracked too.</p></li>
+      <li><span class="dot" aria-hidden="true">4</span><h3>Send a reminder</h3><p>The dashboard lists memberships about to expire. Send the WhatsApp or email reminder from your own template.</p></li>
+      <li><span class="dot" aria-hidden="true">5</span><h3>Renew</h3><p>The member renews, and revenue, profit and the day's cash closing update with it.</p></li>
+    </ol>
+  </section>
+
+  <section class="sec wrap" aria-labelledby="g-h">
+    <div class="sec-head">
+      <h2 id="g-h">Control who can touch what.</h2>
+      <p>A gym has owners, trainers, front desk staff and accountants. Each should see only what their job needs.</p>
+    </div>
+    <dl class="guard">
+      <div><dt>Roles and permissions</dt><dd>Set what each role can see and change, module by module.</dd></div>
+      <div><dt>Audit log</dt><dd>Every change records who made it, so questions about a figure have an answer.</dd></div>
+      <div><dt>Device sessions</dt><dd>See which devices are signed in to an account.</dd></div>
+      <div><dt>Module switches</dt><dd>Turn off modules you do not use. If you skip Equipment, it disappears.</dd></div>
+      <div><dt>Dashboard by role</dt><dd>Choose which widgets the front desk, trainers and accountants see on their home screen.</dd></div>
+      <div><dt>Exports and invoices</dt><dd>Download reports as Excel files and share invoices as PDFs.</dd></div>
+    </dl>
+    <p class="stack"><b>Built with</b> React, Redux and Tailwind on the front end, Node.js, Express and MongoDB behind it, and OpenAPI documentation for the API.</p>
+  </section>
+
+  <section class="sec wrap" aria-labelledby="c-h">
+    <div class="cta">
+      <h2 id="c-h">See it with your own gym's numbers.</h2>
+      <p>Rhema Solutions builds Gym ERP. Tell them about your gym and they will walk you through the modules that fit.</p>
+      <div class="cta-row"><a class="btn" href="https://www.rhema.co.in/" target="_blank" rel="noopener">Talk to Rhema Solutions</a></div>
+      <div class="cta-plates" aria-hidden="true">
+        <i style="height:230px;background:var(--red)"></i><i style="height:200px;background:var(--blue)"></i><i style="height:170px;background:var(--yellow)"></i><i style="height:130px;background:var(--green)"></i><i style="height:96px;background:var(--white-plate)"></i>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>Rhema Gym ERP, a product of <a href="https://www.rhema.co.in/" target="_blank" rel="noopener">Rhema Solutions</a></span>
+  <span>Technology that moves you forward</span>
+</footer>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+
+  /* ---------- Hero barbell ---------- */
+  var plates = [
+    { kg: 25, cls: 'p0', c: 'var(--red)' },
+    { kg: 20, cls: 'p1', c: 'var(--blue)' },
+    { kg: 15, cls: 'p2', c: 'var(--yellow)' },
+    { kg: 10, cls: 'p3', c: 'var(--green)' },
+    { kg: 5, cls: 'p4', c: 'var(--white-plate)' }
+  ];
+  var on = [true, true, true, true, true];
+  var left = $('.side.l'), right = $('.side.r');
+  var order = [4, 3, 2, 1, 0]; // outer to inner on the left sleeve
+  function plateBtn(i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'plate ' + plates[i].cls; b.dataset.i = i;
+    b.setAttribute('aria-label', plates[i].kg + ' kilogram plate, click to toggle');
+    b.innerHTML = '<span>' + plates[i].kg + '</span>';
+    b.addEventListener('click', function () { toggle(i); });
+    return b;
+  }
+  order.forEach(function (i) { left.appendChild(plateBtn(i)); });
+  order.slice().reverse().forEach(function (i) { right.appendChild(plateBtn(i)); });
+  var chips = $('#chips');
+  plates.forEach(function (p, i) {
+    var c = document.createElement('button');
+    c.type = 'button'; c.className = 'chip'; c.textContent = p.kg + ' kg';
+    c.style.setProperty('--c', p.c); c.setAttribute('aria-pressed', 'true'); c.dataset.i = i;
+    c.addEventListener('click', function () { toggle(i); });
+    chips.appendChild(c);
+  });
+  function toggle(i) {
+    on[i] = !on[i];
+    document.querySelectorAll('.plate[data-i="' + i + '"]').forEach(function (el) { el.classList.toggle('off', !on[i]); });
+    $('.chip[data-i="' + i + '"]').setAttribute('aria-pressed', String(on[i]));
+    var kg = 20; plates.forEach(function (p, j) { if (on[j]) kg += p.kg * 2; });
+    $('#kg').textContent = kg;
+  }
+
+  /* ---------- Modules ---------- */
+  var mods = [
+    { id: 'members', name: 'Members', c: 'var(--red)', dark: 0, title: 'Members',
+      lead: 'One complete profile per person, from first visit to last renewal.',
+      points: ['Photo, contact details, blood group and emergency contact on one screen', 'Height, weight and BMI, plus medical conditions the trainer should know about', 'Track who referred whom', 'Status shows at a glance: active, expired, suspended, frozen or cancelled'],
+      head: ['ID', 'Name', 'Plan', 'Status'],
+      rows: [['GYM0001', 'Arjun Nair', 'Quarterly', 'pill:ok:Active'], ['GYM0002', 'Divya Raman', 'Annual', 'pill:ok:Active'], ['GYM0003', 'Karthik S', 'Monthly', 'pill:bad:Expired'], ['GYM0004', 'Meena Iyer', 'Half-yearly', 'pill:info:Frozen']] },
+    { id: 'plans', name: 'Plans', c: 'var(--blue)', dark: 0, title: 'Plans and memberships',
+      lead: 'Define what you sell once, then assign it in a few clicks.',
+      points: ['Create plans with their own duration and fee', 'Assign a plan to a member, or change it mid-term', 'Freeze a membership while a member is away', 'Transfer a membership to someone else'],
+      head: ['Plan', 'Duration', 'Fee', 'Members'],
+      rows: [['Monthly', '1 month', '₹1,500', '148'], ['Quarterly', '3 months', '₹4,000', '112'], ['Half-yearly', '6 months', '₹7,200', '82'], ['Annual', '12 months', '₹12,000', '70']] },
+    { id: 'payments', name: 'Payments', c: 'var(--yellow)', dark: 1, title: 'Payments and invoices',
+      lead: 'Every rupee in has a record, and every record has an invoice.',
+      points: ['Record payments by method as they happen', 'See pending payments in one list', 'Issue refunds that flow into revenue figures', 'Download a PDF invoice with the amount written in words'],
+      head: ['Invoice', 'Member', 'Amount', 'Status'],
+      rows: [['INV-0412', 'Arjun Nair', '₹4,000', 'pill:ok:Paid'], ['INV-0413', 'Karthik S', '₹1,500', 'pill:warn:Pending'], ['INV-0414', 'Divya Raman', '₹12,000', 'pill:ok:Paid'], ['INV-0411', 'Meena Iyer', '₹1,500', 'pill:info:Refunded']] },
+    { id: 'finance', name: 'Finance', c: 'var(--green)', dark: 0, title: 'Expenses and finance',
+      lead: 'Know whether the month made money before the month ends.',
+      points: ['Log expenses by category', 'Profit is worked out from net revenue and expenses', 'Close the cash drawer at the end of each day', 'Export reports to Excel for your accountant'],
+      head: ['Item', 'Period', 'Amount'],
+      rows: [['Fees collected', '1 to 18 Nov', '₹3,97,500'], ['Refunds', '1 to 18 Nov', '−₹13,000'], ['Expenses', '1 to 18 Nov', '−₹1,92,000'], ['Net profit', '1 to 18 Nov', '₹1,92,500']] },
+    { id: 'equipment', name: 'Equipment', c: 'var(--white-plate)', dark: 1, title: 'Equipment and maintenance',
+      lead: 'Know what you own, where it is and whether it works.',
+      points: ['Each machine gets an ID such as EQP001, with brand, model and serial number', 'Warranty start and end dates stay on the record', 'Mark a machine active, under maintenance, damaged, repaired or retired', 'Maintenance history is kept even after a machine is removed'],
+      head: ['ID', 'Machine', 'Location', 'Status'],
+      rows: [['EQP001', 'Treadmill T-90', 'Cardio floor', 'pill:ok:Active'], ['EQP014', 'Cable crossover', 'Strength zone', 'pill:warn:Maintenance'], ['EQP022', 'Hex dumbbells', 'Free weights', 'pill:ok:Active'], ['EQP031', 'Leg press', 'Strength zone', 'pill:bad:Damaged']] },
+    { id: 'messages', name: 'Messages', c: 'var(--red)', dark: 0, title: 'WhatsApp and email',
+      lead: 'Reminders go out in your words, not a stock template.',
+      points: ['Edit the WhatsApp and email templates for expiry and renewal reminders', 'Fill in the member name, plan and dates automatically', 'Keep a log of what was sent and to whom', 'WhatsApp and email templates are stored separately'],
+      bubble: 'Hi Arjun,\n\nYour *Quarterly* membership at Iron Works Gym expires on *24 Nov 2026* (6 day(s) left).\n\nRenew soon to keep your progress going without any break!' },
+    { id: 'staff', name: 'Staff', c: 'var(--blue)', dark: 0, title: 'Staff and access',
+      lead: 'Give each person the access their job needs and nothing more.',
+      points: ['Create staff accounts with their own sign-in', 'Build custom roles with permissions per module', 'Review every change in the audit log', 'Pick the dashboard widgets each role sees'],
+      head: ['Role', 'Members', 'Payments', 'Finance'],
+      rows: [['Owner', 'Full access', 'Full access', 'Full access'], ['Front desk', 'View, add, edit', 'View, add', 'No access'], ['Trainer', 'View', 'No access', 'No access'], ['Accountant', 'View', 'View, edit', 'Full access']] }
+  ];
+  var rack = $('#rack'), panel = $('#panel');
+  mods.forEach(function (m, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'disc'; b.id = 'tab-' + m.id; b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', 'false'); b.setAttribute('aria-controls', 'panel'); b.tabIndex = -1;
+    b.style.setProperty('--c', m.c); if (m.dark) b.dataset.dark = '1';
+    b.innerHTML = '<span>' + m.name + '</span>';
+    b.addEventListener('click', function () { select(i, true); });
+    b.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return; e.preventDefault();
+      var n = (i + d + mods.length) % mods.length; select(n, true); rack.children[n].focus();
+    });
+    rack.appendChild(b);
+  });
+  function cell(v) {
+    if (v.indexOf('pill:') === 0) { var p = v.split(':'); return '<td><span class="pill ' + p[1] + '">' + p[2] + '</span></td>'; }
+    return '<td>' + v + '</td>';
+  }
+  function select(i, animate) {
+    var m = mods[i];
+    Array.prototype.forEach.call(rack.children, function (el, j) {
+      el.setAttribute('aria-selected', String(j === i)); el.tabIndex = j === i ? 0 : -1;
+      el.classList.remove('spin');
+    });
+    if (animate) { void rack.children[i].offsetWidth; rack.children[i].classList.add('spin'); }
+    panel.setAttribute('aria-labelledby', 'tab-' + m.id);
+    panel.style.setProperty('--c', m.c === 'var(--white-plate)' ? 'var(--steel)' : m.c);
+    var mock;
+    if (m.bubble) {
+      mock = '<div class="mock"><div class="mock-bar"><span>Membership expiry reminder</span><span>Sample message</span></div><div class="bubble-wrap"><div class="bubble"></div><div class="bubble-meta">Sent to Arjun Nair on WhatsApp</div></div></div>';
+    } else {
+      mock = '<div class="mock"><div class="mock-bar"><span>' + m.title + '</span><span>Sample data</span></div><div class="tbl"><table><thead><tr>' +
+        m.head.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
+        m.rows.map(function (r) { return '<tr>' + r.map(cell).join('') + '</tr>'; }).join('') + '</tbody></table></div></div>';
+    }
+    panel.innerHTML = '<div><h3>' + m.title + '</h3><p class="lead">' + m.lead + '</p><ul>' + m.points.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul></div>' + mock;
+    if (m.bubble) panel.querySelector('.bubble').textContent = m.bubble;
+  }
+  select(0, false);
+
+  /* ---------- Equipment ---------- */
+  var statuses = [
+    ['active', 'Active', 'On the floor and in use.'],
+    ['under_maintenance', 'Under maintenance', 'Taken out of use. The job goes into its maintenance history.'],
+    ['damaged', 'Damaged', 'Flagged for repair so nobody uses it by mistake.'],
+    ['repaired', 'Repaired', 'Fixed and back in use, with the repair on record.'],
+    ['retired', 'Retired', 'Off the floor for good. The history stays on file.']
+  ];
+  var treadmill = '<svg viewBox="0 0 220 140" role="img" aria-label="Treadmill"><line class="st-steel" x1="12" y1="126" x2="208" y2="126" stroke-width="3"/>' +
+    '<path class="st-steel" d="M148 98 L172 30" stroke-width="7"/><path class="st-steel" d="M172 30 L196 36" stroke-width="7"/>' +
+    '<rect class="fl-dark" x="150" y="16" width="44" height="18" rx="4" transform="rotate(14 172 25)"/>' +
+    '<rect class="fl-steel" x="22" y="100" width="150" height="20" rx="10"/>' +
+    '<line class="belt" x1="34" y1="104" x2="160" y2="104"/>' +
+    '<circle class="fl-dark roll" cx="32" cy="110" r="9"/><circle class="fl-dark roll" cx="162" cy="110" r="9"/>' +
+    '<line class="st-steel" x1="40" y1="120" x2="40" y2="126" stroke-width="5"/><line class="st-steel" x1="150" y1="120" x2="150" y2="126" stroke-width="5"/></svg>';
+  var kettle = '<svg viewBox="0 0 220 140" role="img" aria-label="Kettlebell swinging"><line class="st-steel" x1="60" y1="8" x2="160" y2="8" stroke-width="4"/>' +
+    '<g class="swing"><line class="st-steel" x1="110" y1="8" x2="110" y2="62" stroke-width="3"/>' +
+    '<path class="st-steel" d="M92 82 C88 52 132 52 128 82" stroke-width="8"/><circle class="fl-red" cx="110" cy="102" r="28"/><circle cx="102" cy="94" r="6" fill="#fff" opacity=".25"/></g></svg>';
+  var dumb = '<svg viewBox="0 0 220 140" role="img" aria-label="Dumbbell curl"><line class="st-steel" x1="70" y1="28" x2="70" y2="112" stroke-width="12"/>' +
+    '<circle class="fl-dark" cx="70" cy="112" r="9"/>' +
+    '<g class="curl"><line class="st-steel" x1="70" y1="112" x2="150" y2="112" stroke-width="10"/>' +
+    '<rect class="fl-blue" x="144" y="92" width="12" height="40" rx="3"/><rect class="fl-blue" x="164" y="92" width="12" height="40" rx="3"/><rect class="fl-dark" x="156" y="108" width="8" height="8"/></g></svg>';
+  var machines = [
+    { id: 'EQP001', name: 'Treadmill T-90', where: 'Cardio floor', warranty: 'Warranty to 14 Mar 2027', svg: treadmill, s: 'active' },
+    { id: 'EQP040', name: 'Kettlebell, 16 kg', where: 'Functional zone', warranty: 'No warranty', svg: kettle, s: 'repaired' },
+    { id: 'EQP022', name: 'Hex dumbbell, 12 kg', where: 'Free weights', warranty: 'No warranty', svg: dumb, s: 'under_maintenance' }
+  ];
+  var eq = $('#eq');
+  machines.forEach(function (m, mi) {
+    var el = document.createElement('article'); el.className = 'machine';
+    el.innerHTML = '<div class="stage">' + m.svg + '</div><h3>' + m.name + '</h3>' +
+      '<div class="m-meta"><span>' + m.id + ', ' + m.where + '</span><span>' + m.warranty + '</span></div>' +
+      '<div class="stat-chips" role="radiogroup" aria-label="Status of ' + m.name + '">' +
+      statuses.map(function (s) { return '<button type="button" role="radio" class="sc" data-s="' + s[0] + '" aria-checked="false">' + s[1] + '</button>'; }).join('') +
+      '</div><p class="m-note" aria-live="polite"></p>';
+    eq.appendChild(el);
+    function setS(s) {
+      el.dataset.status = s;
+      el.querySelectorAll('.sc').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.s === s)); });
+      el.querySelector('.m-note').textContent = statuses.filter(function (x) { return x[0] === s; })[0][2];
+    }
+    el.querySelectorAll('.sc').forEach(function (b) { b.addEventListener('click', function () { setS(b.dataset.s); }); });
+    setS(m.s);
+  });
+
+  /* ---------- Dashboard chart ---------- */
+  var months = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+  var rev = [3.10, 3.32, 3.05, 3.58, 3.71, 3.85];
+  var exp = [1.74, 1.80, 1.66, 1.85, 1.88, 1.92];
+  var W = 600, H = 270, L = 46, R = 8, T = 12, B = 30, max = 4;
+  var iw = W - L - R, ih = H - T - B;
+  var y = function (v) { return T + ih - (v / max) * ih; };
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Monthly revenue and expenses in lakh rupees, June to November 2026">';
+  for (var t = 0; t <= 4; t++) {
+    svg += '<line class="grid-l" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t) + '" y2="' + y(t) + '"/>' +
+      '<text class="ax" x="' + (L - 8) + '" y="' + (y(t) + 4) + '" text-anchor="end">' + (t ? '₹' + t + 'L' : '₹0') + '</text>';
+  }
+  var gw = iw / months.length, bw = gw * 0.3;
+  months.forEach(function (mn, i) {
+    var gx = L + gw * i + gw / 2;
+    svg += '<rect class="bar-rev bar-grow" x="' + (gx - bw - 2) + '" y="' + y(rev[i]) + '" width="' + bw + '" height="' + (y(0) - y(rev[i])) + '" rx="2" style="animation-delay:' + (i * 80) + 'ms"/>' +
+      '<rect class="bar-exp bar-grow" x="' + (gx + 2) + '" y="' + y(exp[i]) + '" width="' + bw + '" height="' + (y(0) - y(exp[i])) + '" rx="2" style="animation-delay:' + (i * 80 + 40) + 'ms"/>' +
+      '<text class="ax" x="' + gx + '" y="' + (H - 8) + '" text-anchor="middle">' + mn + '</text>';
+  });
+  svg += '</svg>';
+  $('#chart').innerHTML = svg;
+
+  var plans = [['Monthly', 148, 'var(--red)'], ['Quarterly', 112, 'var(--blue)'], ['Half-yearly', 82, 'var(--yellow)'], ['Annual', 70, 'var(--green)']];
+  var total = plans.reduce(function (a, p) { return a + p[1]; }, 0);
+  $('#dist').innerHTML = plans.map(function (p) {
+    var pct = Math.round(p[1] / total * 100);
+    return '<div class="dist-row"><div><span>' + p[0] + '</span><span>' + p[1] + ' members, ' + pct + '%</span></div><div class="track"><div class="fill" style="width:' + (p[1] / 148 * 100) + '%;background:' + p[2] + '"></div></div></div>';
+  }).join('');
+
+  /* ---------- Scroll-triggered replays (content is already visible at rest) ---------- */
+  var fmt = function (n) { return '₹' + n.toLocaleString('en-IN'); };
+  function countUp(el) {
+    var end = +el.dataset.count, inr = el.dataset.fmt === 'inr', t0 = null;
+    function step(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / 1100), v = Math.round(end * (1 - Math.pow(1 - p, 3)));
+      el.textContent = inr ? fmt(v) : v;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('play');
+        e.target.querySelectorAll('[data-count]').forEach(countUp);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.25 });
+    io.observe($('#dash')); io.observe($('#flow'));
+  }
+})();
+</script>
