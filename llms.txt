@@ -1,0 +1,11 @@
+# Rhema Gym ERP
+
+Gym management software for member records, memberships, renewals, billing, payments and gym operations.
+
+## Website
+https://gym.rhema.co.in/
+
+## Publisher
+Rhema Solutions — https://www.rhema.co.in/
+
+For current features and product availability, use the public website as the source of truth.
